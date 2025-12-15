@@ -1,10 +1,11 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Users, Settings, Zap, Trophy } from 'lucide-react';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import { useResponsive } from '../hooks/useResponsive';
 
 export default function SessionLobby() {
+  const navigate = useNavigate();
   useParams();
   const { isMobile } = useResponsive();
 
@@ -116,7 +117,12 @@ export default function SessionLobby() {
               </Button>
 
               {/* Ready Button */}
-              <Button variant="success" size="lg" className="w-full font-bold text-lg">
+              <Button 
+                variant="success" 
+                size="lg" 
+                className="w-full font-bold text-lg"
+                onClick={() => navigate('/race')}
+              >
                 🚀 Ready to Race!
               </Button>
 

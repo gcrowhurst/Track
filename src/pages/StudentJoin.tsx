@@ -27,10 +27,13 @@ export default function StudentJoin() {
     setError('');
 
     try {
+      // Store player info
+      sessionStorage.setItem('playerName', name.trim());
+      sessionStorage.setItem('playerColor', color);
+      sessionStorage.setItem('sessionCode', code.toUpperCase());
+
       setTimeout(() => {
-        navigate(`/session/demo/lobby`, {
-          state: { code, name, color },
-        });
+        navigate('/race');
       }, 500);
     } catch (err) {
       setError('Failed to join session. Please check your code and try again.');

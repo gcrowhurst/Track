@@ -1,4 +1,4 @@
-import type { CheckpointPosition, TrackLayout } from '../types';
+import type { TrackLayout } from '../types';
 
 /**
  * Enhanced Racing Engine with Checkpoint Detection and Lap Counting
@@ -88,19 +88,21 @@ export class EnhancedRacingEngine {
    */
   loadTrack(layout: TrackLayout) {
     this.trackPath = this.generateTrackFromLayout(layout);
-    this.checkpoints = layout.checkpoints.map((cp) => ({
-      id: cp.id,
-      x: cp.position.x,
-      y: cp.position.y,
-      radius: cp.trigger_radius,
-      passed: new Set(),
-    }));
+    this.checkpoints = layout.checkpoints
+      .filter((cp): cp is Required<typeof cp> => cp.position !== undefined)
+      .map((cp) => ({
+        id: cp.id,
+        x: cp.position.x,
+        y: cp.position.y,
+        radius: cp.trigger_radius,
+        passed: new Set(),
+      }));
   }
 
   /**
    * Generate track path from layout pieces
    */
-  private generateTrackFromLayout(layout: TrackLayout): TrackPoint[] {
+  private generateTrackFromLayout(_layout: TrackLayout): TrackPoint[] {
     const path: TrackPoint[] = [];
     
     // For MVP, we'll use simple oval

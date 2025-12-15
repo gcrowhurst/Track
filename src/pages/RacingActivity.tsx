@@ -1,198 +1,329 @@
-import { useEffect, useRef } from 'react';
-import { useRacingStore } from '../store';
-import { useResponsive } from '../hooks/useResponsive';
-import { getOptimalFontSize } from '../utils/deviceDetection';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ThreeDRacingEngine } from '../utils/threeDRacingEngine';
+import QuestionModal from '../components/QuestionModal';
 import Button from '../components/Button';
+import { SAMPLE_QUESTIONS } from '../data/questions';
+import { Zap, Home, Trophy } from 'lucide-react';
+
+interface RaceStats {
+  finalTime: string;
+  correctAnswers: number;
+  totalAnswers: number;
+  accuracy: number;
+  topSpeed: number;
+  finalLap: number;
+}
 
 export default function RacingActivity() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const racingState = useRacingStore();
-  const { isMobile, isTablet } = useResponsive();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const engineRef = useRef<ThreeDRacingEngine | null>(null);
+  const navigate = useNavigate();
 
+  // Game state
+  const [isRacing, setIsRacing] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+  const [currentQuestion, setCurrentQuestion] = useState<any>(null);
+  const [questionsPassed, setQuestionsPassed] = useState<Set<string>>(new Set());
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [currentLap, setCurrentLap] = useState(1);
+  const [raceFinished, setRaceFinished] = useState(false);
+  const [raceTime, setRaceTime] = useState(0);
+  const [stats, setStats] = useState<RaceStats | null>(null);
+  const [showingQuestion, setShowingQuestion] = useState(false);
+  const [maxSpeed, setMaxSpeed] = useState(0);
+
+  // Keyboard state
+  const keysPressed = useRef<Set<string>>(new Set());
+
+  // Initialize engine and set up race
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!containerRef.current) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Handle high DPI screens
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
-    
-    // Adjust scale based on device
-    const calculatedScale = isMobile ? 0.8 : isTablet ? 0.9 : 1;
-
-    // Start racing
-    racingState.startRace();
-
-    let animationFrameId: number;
-    let time = 0;
-
-    const drawTrack = () => {
-      // Clear canvas
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, rect.width, rect.height);
-
-      // Draw simple oval track
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 3 * calculatedScale;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const trackRadiusX = 200 * calculatedScale;
-      const trackRadiusY = 150 * calculatedScale;
-      
-      ctx.beginPath();
-      ctx.ellipse(centerX, centerY, trackRadiusX, trackRadiusY, 0, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Draw start line
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(centerX - 100 * calculatedScale, centerY + 120 * calculatedScale, 200 * calculatedScale, 10);
-      ctx.fillStyle = '#ffffff';
-      for (let i = 0; i < 20; i++) {
-        if (i % 2 === 0) {
-          ctx.fillRect(centerX - 100 * calculatedScale + i * 10 * calculatedScale, centerY + 120 * calculatedScale, 5 * calculatedScale, 10);
+    // Create engine
+    const engine = new ThreeDRacingEngine(
+      containerRef.current,
+      (vehicleId, checkpointId) => {
+        // Checkpoint reached - show question if not already answered
+        if (!questionsPassed.has(checkpointId)) {
+          const randomQuestion = SAMPLE_QUESTIONS[Math.floor(Math.random() * SAMPLE_QUESTIONS.length)];
+          setCurrentQuestion({ ...randomQuestion, checkpointId });
+          setShowingQuestion(true);
+        }
+      },
+      (vehicleId, lapNumber) => {
+        // Update current lap on completion
+        if (lapNumber <= 3) {
+          setCurrentLap(lapNumber);
+        }
+        // Finish race after 3 laps
+        if (lapNumber >= 3) {
+          setRaceFinished(true);
         }
       }
+    );
 
-      // Draw vehicle
-      const vehicleX = centerX + Math.cos(time * 0.01) * trackRadiusX;
-      const vehicleY = centerY + Math.sin(time * 0.01) * trackRadiusY;
-      const vehicleRotation = time * 0.01;
+    // Add player vehicle
+    const playerName = sessionStorage.getItem('playerName') || 'Racer';
+    const playerColor = sessionStorage.getItem('playerColor') || '#3b82f6';
+    engine.addVehicle('player', playerName, playerColor);
 
-      ctx.save();
-      ctx.translate(vehicleX, vehicleY);
-      ctx.rotate(vehicleRotation);
+    engineRef.current = engine;
 
-      // Vehicle body
-      ctx.fillStyle = '#3b82f6';
-      ctx.fillRect(-15 * calculatedScale, -10 * calculatedScale, 30 * calculatedScale, 20 * calculatedScale);
-
-      // Vehicle window
-      ctx.fillStyle = '#93c5fd';
-      ctx.fillRect(-10 * calculatedScale, -5 * calculatedScale, 20 * calculatedScale, 10 * calculatedScale);
-
-      ctx.restore();
-
-      // Draw lap info with responsive font size
-      ctx.fillStyle = '#ffffff';
-      const fontSize = getOptimalFontSize(isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop');
-      ctx.font = `bold ${fontSize * 1.5}px Arial`;
-      ctx.fillText(`Lap ${racingState.currentLap}/3`, 20, 40);
-      ctx.font = `${fontSize}px Arial`;
-      ctx.fillText(`Time: ${(time / 1000).toFixed(1)}s`, 20, 70);
-      ctx.fillText(`Speed: ${Math.round(Math.random() * 100)} km/h`, 20, 100);
-    };
-
-    const animate = () => {
-      time += 16.67; // 60 FPS
-      drawTrack();
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      if (canvas) {
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
+    // Countdown and start
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          setIsRacing(true);
+          engine.start();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', handleResize);
-      racingState.endRace();
+      clearInterval(countdownInterval);
+      engine.dispose();
     };
-  }, [racingState, isMobile, isTablet]);
+  }, []);
+
+  // Race timer
+  useEffect(() => {
+    if (!isRacing || raceFinished) return;
+
+    const timer = setInterval(() => {
+      setRaceTime((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isRacing, raceFinished]);
+
+  // Keyboard controls
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      keysPressed.current.add(e.key.toLowerCase());
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      keysPressed.current.delete(e.key.toLowerCase());
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  // Vehicle update loop
+  useEffect(() => {
+    if (!isRacing || !engineRef.current) return;
+
+    const interval = setInterval(() => {
+      const controls = {
+        forward: keysPressed.current.has('arrowup') || keysPressed.current.has('w'),
+        backward: keysPressed.current.has('arrowdown') || keysPressed.current.has('s'),
+        left: keysPressed.current.has('arrowleft') || keysPressed.current.has('a'),
+        right: keysPressed.current.has('arrowright') || keysPressed.current.has('d'),
+      };
+
+      engineRef.current?.updateVehicle('player', controls);
+
+      // Track max speed
+      const vehicle = engineRef.current?.getVehicle('player');
+      if (vehicle) {
+        setMaxSpeed((prev) => Math.max(prev, Math.abs(vehicle.velocity) * 100));
+      }
+    }, 16); // ~60 FPS
+
+    return () => clearInterval(interval);
+  }, [isRacing]);
+
+  // Handle race finish
+  useEffect(() => {
+    if (!raceFinished) return;
+
+    const totalQuestions = questionsPassed.size;
+    const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+
+    setStats({
+      finalTime: `${Math.floor(raceTime / 60)}:${(raceTime % 60).toString().padStart(2, '0')}`,
+      correctAnswers,
+      totalAnswers: totalQuestions,
+      accuracy,
+      topSpeed: Math.round(maxSpeed),
+      finalLap: currentLap,
+    });
+  }, [raceFinished]);
+
+  const handleAnswer = (selectedIndex: number) => {
+    if (!currentQuestion) return;
+
+    const isCorrect = selectedIndex === currentQuestion.correct_answer;
+    if (isCorrect) {
+      setCorrectAnswers((prev) => prev + 1);
+    }
+
+    setQuestionsPassed((prev) => new Set([...prev, currentQuestion.checkpointId]));
+    setShowingQuestion(false);
+    setCurrentQuestion(null);
+  };
+
+  const formatTime = (seconds: number) => {
+    return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
+  };
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-slate-900 relative flex flex-col safe-bottom">
-      <canvas ref={canvasRef} className="flex-1 w-full" />
+    <div className="relative w-full h-screen bg-slate-900 overflow-hidden">
+      {/* 3D Canvas Container */}
+      <div ref={containerRef} className="w-full h-full" />
 
-      {/* UI Overlays */}
-      <div className={`absolute top-0 left-0 p-4 pointer-events-none ${isMobile ? 'w-full' : ''}`}>
-        <div className={`bg-slate-800/80 backdrop-blur-sm rounded-lg p-4 text-white ${
-          isMobile ? 'w-full' : 'max-w-md'
-        }`}>
-          <div className={`grid gap-4 ${isMobile ? 'grid-cols-4 text-xs' : 'grid-cols-2 gap-4'}`}>
-            <div>
-              <p className="text-slate-400 text-xs sm:text-sm">Position</p>
-              <p className={`font-bold ${isMobile ? 'text-lg' : 'text-2xl'}`}>2nd</p>
+      {/* Pre-race Countdown */}
+      {!isRacing && countdown > 0 && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-40">
+          <div className="text-center">
+            <div className="text-8xl font-black text-yellow-400 mb-8 animate-bounce">
+              {countdown}
             </div>
-            <div>
-              <p className="text-slate-400 text-xs sm:text-sm">Lap</p>
-              <p className={`font-bold ${isMobile ? 'text-lg' : 'text-2xl'}`}>1/3</p>
+            <p className="text-white text-2xl font-bold">Get Ready to Race!</p>
+          </div>
+        </div>
+      )}
+
+      {/* HUD Overlay (during race) */}
+      {isRacing && !raceFinished && (
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top left - Race info */}
+          <div className="absolute top-6 left-6 text-white font-bold">
+            <div className="bg-black/60 backdrop-blur-sm px-4 py-3 rounded-lg border-2 border-yellow-400">
+              <div className="text-2xl mb-2">
+                <span className="text-yellow-400">LAP</span> {currentLap}/3
+              </div>
+              <div className="text-xl">
+                <span className="text-cyan-400">TIME</span> {formatTime(raceTime)}
+              </div>
+              <div className="text-lg mt-2">
+                <span className="text-green-400">✓</span> {correctAnswers}/{questionsPassed.size}
+              </div>
+              <div className="text-lg">
+                <span className="text-purple-400">⚡</span> {maxSpeed} km/h
+              </div>
             </div>
-            <div>
-              <p className="text-slate-400 text-xs sm:text-sm">Correct</p>
-              <p className={`font-bold ${isMobile ? 'text-lg' : 'text-2xl'}`}>2</p>
-            </div>
-            <div>
-              <p className="text-slate-400 text-xs sm:text-sm">Time</p>
-              <p className={`font-bold ${isMobile ? 'text-lg' : 'text-2xl'}`}>2:34</p>
+          </div>
+
+          {/* Top right - Controls hint */}
+          <div className="absolute top-6 right-6 text-white text-sm bg-black/60 backdrop-blur-sm px-4 py-3 rounded-lg border border-blue-400">
+            <p className="font-bold mb-2">CONTROLS</p>
+            <p>↑ / W - Forward</p>
+            <p>↓ / S - Backward</p>
+            <p>← / A - Left</p>
+            <p>→ / D - Right</p>
+          </div>
+
+          {/* Bottom - Speed bar */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-64">
+            <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg border border-cyan-400">
+              <div className="flex justify-between text-white text-sm mb-2">
+                <span>SPEED</span>
+                <span>{Math.round(maxSpeed)}</span>
+              </div>
+              <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-cyan-400 to-blue-500 h-full transition-all"
+                  style={{ width: `${Math.min((maxSpeed / 300) * 100, 100)}%` }}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Mobile Controls - Bottom Safeguard */}
-      <div className={`absolute bottom-4 left-4 right-4 flex gap-2 pointer-events-auto safe-bottom ${
-        isMobile ? 'flex-col sm:flex-row' : 'flex-row'
-      }`}>
-        <Button
-          variant="primary"
-          className="flex-1 text-sm sm:text-base py-2 sm:py-3"
-          onClick={() => console.log('Left')}
-        >
-          ◀ Left
-        </Button>
-        <Button
-          variant="success"
-          className="flex-1 text-sm sm:text-base py-2 sm:py-3"
-          onClick={() => console.log('Accelerate')}
-        >
-          🚀 Accelerate
-        </Button>
-        <Button
-          variant="primary"
-          className="flex-1 text-sm sm:text-base py-2 sm:py-3"
-          onClick={() => console.log('Right')}
-        >
-          Right ▶
-        </Button>
-      </div>
+      {/* Question Modal */}
+      {showingQuestion && currentQuestion && !raceFinished && (
+        <QuestionModal
+          question={currentQuestion}
+          timeLimit={30}
+          onAnswer={handleAnswer}
+          onSkip={() => {
+            setQuestionsPassed((prev) => new Set([...prev, currentQuestion.checkpointId]));
+            setShowingQuestion(false);
+            setCurrentQuestion(null);
+          }}
+          checkpointNumber={questionsPassed.size}
+          totalCheckpoints={SAMPLE_QUESTIONS.length}
+        />
+      )}
 
-      {/* Leaderboard */}
-      <div className={`absolute top-4 right-4 bg-slate-800/80 backdrop-blur-sm rounded-lg p-4 text-white pointer-events-none ${
-        isMobile ? 'max-w-xs' : 'max-w-sm'
-      }`}>
-        <h3 className={`font-bold mb-3 ${isMobile ? 'text-sm' : 'text-base'}`}>Leaderboard</h3>
-        <div className={`space-y-2 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-          <div className="flex justify-between">
-            <span>🥇 Sarah</span>
-            <span className="text-green-400">1st</span>
-          </div>
-          <div className="flex justify-between bg-blue-900/30 px-2 py-1 rounded">
-            <span>🥈 You</span>
-            <span className="text-blue-400">2nd</span>
-          </div>
-          <div className="flex justify-between">
-            <span>🥉 James</span>
-            <span>3rd</span>
+      {/* Race Finished Screen */}
+      {raceFinished && stats && (
+        <div className="absolute inset-0 bg-gradient-to-br from-black/90 to-slate-900/90 flex items-center justify-center z-50">
+          <div className="text-center max-w-md">
+            <Trophy className="w-20 h-20 text-yellow-400 mx-auto mb-6 animate-bounce" />
+            <h1 className="text-5xl font-black text-yellow-400 mb-8">RACE COMPLETE!</h1>
+
+            <div className="bg-slate-800/80 backdrop-blur-sm rounded-xl border-2 border-yellow-400 p-8 mb-8">
+              <div className="space-y-4">
+                <div className="flex justify-between text-white text-lg">
+                  <span>Final Time:</span>
+                  <span className="text-cyan-400 font-bold">{stats.finalTime}</span>
+                </div>
+                <div className="flex justify-between text-white text-lg">
+                  <span>Lap Completed:</span>
+                  <span className="text-green-400 font-bold">{stats.finalLap}</span>
+                </div>
+                <div className="flex justify-between text-white text-lg">
+                  <span>Questions Answered:</span>
+                  <span className="text-purple-400 font-bold">
+                    {stats.correctAnswers}/{stats.totalAnswers}
+                  </span>
+                </div>
+                <div className="flex justify-between text-white text-lg">
+                  <span>Accuracy:</span>
+                  <span className="text-yellow-400 font-bold">{stats.accuracy}%</span>
+                </div>
+                <div className="flex justify-between text-white text-lg">
+                  <span>Top Speed:</span>
+                  <span className="text-red-400 font-bold">{stats.topSpeed} km/h</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Button
+                variant="primary"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => window.location.reload()}
+              >
+                <Zap className="w-5 h-5" />
+                Race Again
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => navigate('/')}
+              >
+                <Home className="w-5 h-5" />
+                Back to Home
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Exit button */}
+      {!raceFinished && (
+        <button
+          onClick={() => navigate('/')}
+          className="absolute top-6 right-6 z-30 bg-red-500/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors"
+        >
+          <Home className="w-4 h-4" />
+          Exit
+        </button>
+      )}
     </div>
   );
 }

@@ -91,6 +91,7 @@ function App() {
           <Route path="/student/join" element={<StudentJoin />} />
           <Route path="/session/:sessionId/lobby" element={<SessionLobby />} />
           <Route path="/session/:sessionId/race" element={<RacingActivity />} />
+          <Route path="/race" element={<RacingActivity />} />
         </Routes>
         <Notification />
       </div>

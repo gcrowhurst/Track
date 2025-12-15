@@ -9,7 +9,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   // ENGINE / COOLING SYSTEM QUESTIONS
   {
     question_text: "What component regulates coolant flow based on engine temperature?",
-    image_url: null,
+    image_url: undefined,
     options: ["Thermostat", "Radiator", "Water pump", "Coolant reservoir"],
     correct_answer: 0,
     topic: "Engine Cooling",
@@ -21,7 +21,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "Which component pressurizes the cooling system?",
-    image_url: null,
+    image_url: undefined,
     options: ["Radiator cap", "Water pump", "Expansion tank", "Fan shroud"],
     correct_answer: 0,
     topic: "Engine Cooling",
@@ -33,7 +33,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is the typical operating temperature range for most engines?",
-    image_url: null,
+    image_url: undefined,
     options: ["60-70°C", "80-95°C", "100-115°C", "120-135°C"],
     correct_answer: 1,
     topic: "Engine Cooling",
@@ -47,7 +47,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   // BRAKE SYSTEM QUESTIONS
   {
     question_text: "Which component converts driver input into hydraulic pressure in the brake system?",
-    image_url: null,
+    image_url: undefined,
     options: ["Brake pedal", "Master cylinder", "Brake caliper", "ABS pump"],
     correct_answer: 1,
     topic: "Brake Systems",
@@ -59,7 +59,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is the purpose of brake fluid in a hydraulic brake system?",
-    image_url: null,
+    image_url: undefined,
     options: ["Lubrication", "Pressure transmission", "Cooling", "Cleaning"],
     correct_answer: 1,
     topic: "Brake Systems",
@@ -71,7 +71,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "Which type of brake system uses friction between a rotor and pads?",
-    image_url: null,
+    image_url: undefined,
     options: ["Drum brake", "Disc brake", "Parking brake", "Engine brake"],
     correct_answer: 1,
     topic: "Brake Systems",
@@ -83,7 +83,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What does ABS stand for?",
-    image_url: null,
+    image_url: undefined,
     options: ["Automatic Brake System", "Anti-lock Braking System", "Advanced Brake Safety", "Assisted Braking Service"],
     correct_answer: 1,
     topic: "Brake Systems",
@@ -97,7 +97,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   // TRANSMISSION QUESTIONS
   {
     question_text: "What is the primary function of a clutch in a manual transmission?",
-    image_url: null,
+    image_url: undefined,
     options: ["Increase speed", "Disconnect engine from gearbox", "Cool the engine", "Filter oil"],
     correct_answer: 1,
     topic: "Transmission",
@@ -109,7 +109,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "In a manual gearbox, which component synchronizes gear speeds?",
-    image_url: null,
+    image_url: undefined,
     options: ["Clutch plate", "Synchromesh", "Flywheel", "Drive shaft"],
     correct_answer: 1,
     topic: "Transmission",
@@ -121,7 +121,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is the purpose of the differential in a vehicle?",
-    image_url: null,
+    image_url: undefined,
     options: ["Change gears", "Cool transmission", "Allow wheels to rotate at different speeds", "Increase power"],
     correct_answer: 2,
     topic: "Transmission",
@@ -133,7 +133,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "In an automatic transmission, what fluid is used for power transmission?",
-    image_url: null,
+    image_url: undefined,
     options: ["Engine oil", "Brake fluid", "Transmission fluid (ATF)", "Coolant"],
     correct_answer: 2,
     topic: "Transmission",
@@ -147,7 +147,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   // SUSPENSION QUESTIONS
   {
     question_text: "What is the primary purpose of a vehicle's suspension system?",
-    image_url: null,
+    image_url: undefined,
     options: ["Increase speed", "Improve fuel economy", "Absorb road shocks and maintain control", "Cool the brakes"],
     correct_answer: 2,
     topic: "Suspension & Chassis",
@@ -159,7 +159,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "Which component dampens spring oscillations in the suspension?",
-    image_url: null,
+    image_url: undefined,
     options: ["Coil spring", "Shock absorber", "Control arm", "Anti-roll bar"],
     correct_answer: 1,
     topic: "Suspension & Chassis",
@@ -171,7 +171,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What does an anti-roll bar (sway bar) do?",
-    image_url: null,
+    image_url: undefined,
     options: ["Prevent vehicle from rolling over", "Reduce body roll in corners", "Improve straight-line stability", "Increase ground clearance"],
     correct_answer: 1,
     topic: "Suspension & Chassis",
@@ -183,7 +183,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "Which type of spring is most commonly used in modern car suspensions?",
-    image_url: null,
+    image_url: undefined,
     options: ["Leaf spring", "Coil spring", "Torsion bar", "Air spring"],
     correct_answer: 1,
     topic: "Suspension & Chassis",
@@ -197,7 +197,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   // ELECTRICAL SYSTEM QUESTIONS
   {
     question_text: "What is the standard voltage of a car battery?",
-    image_url: null,
+    image_url: undefined,
     options: ["6 volts", "12 volts", "24 volts", "48 volts"],
     correct_answer: 1,
     topic: "Electrical Systems",
@@ -209,7 +209,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "Which component converts mechanical energy from the engine into electrical energy?",
-    image_url: null,
+    image_url: undefined,
     options: ["Battery", "Alternator", "Starter motor", "Spark plug"],
     correct_answer: 1,
     topic: "Electrical Systems",
@@ -221,7 +221,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is the purpose of a fuse in an electrical circuit?",
-    image_url: null,
+    image_url: undefined,
     options: ["Increase voltage", "Protect against overcurrent", "Store electricity", "Generate power"],
     correct_answer: 1,
     topic: "Electrical Systems",
@@ -233,7 +233,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "In a petrol engine, what creates the spark to ignite the fuel-air mixture?",
-    image_url: null,
+    image_url: undefined,
     options: ["Battery", "Alternator", "Ignition coil", "Spark plug"],
     correct_answer: 3,
     topic: "Electrical Systems",
@@ -245,7 +245,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What does ECU stand for in vehicle electronics?",
-    image_url: null,
+    image_url: undefined,
     options: ["Electrical Control Unit", "Engine Control Unit", "Electronic Cooling Unit", "Emissions Check Unit"],
     correct_answer: 1,
     topic: "Electrical Systems",
@@ -259,7 +259,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   // ENGINE FUNDAMENTALS
   {
     question_text: "In a 4-stroke engine, what is the correct order of the cycles?",
-    image_url: null,
+    image_url: undefined,
     options: [
       "Intake, Power, Compression, Exhaust",
       "Intake, Compression, Power, Exhaust",
@@ -276,7 +276,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is the purpose of engine oil?",
-    image_url: null,
+    image_url: undefined,
     options: ["Increase power", "Lubricate and cool engine parts", "Ignite fuel", "Clean exhaust"],
     correct_answer: 1,
     topic: "Engine Fundamentals",
@@ -288,7 +288,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "Which component connects the piston to the crankshaft?",
-    image_url: null,
+    image_url: undefined,
     options: ["Camshaft", "Connecting rod", "Valve stem", "Timing belt"],
     correct_answer: 1,
     topic: "Engine Fundamentals",
@@ -300,7 +300,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is the purpose of a turbocharger?",
-    image_url: null,
+    image_url: undefined,
     options: ["Cool the engine", "Increase air intake pressure", "Filter exhaust", "Reduce noise"],
     correct_answer: 1,
     topic: "Engine Fundamentals",
@@ -314,7 +314,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   // SAFETY & MAINTENANCE
   {
     question_text: "How often should engine oil typically be changed?",
-    image_url: null,
+    image_url: undefined,
     options: ["Every 1,000 miles", "Every 5,000-10,000 miles", "Every 20,000 miles", "Only when it looks dirty"],
     correct_answer: 1,
     topic: "Maintenance",
@@ -326,7 +326,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is the legal minimum tire tread depth in the UK?",
-    image_url: null,
+    image_url: undefined,
     options: ["1mm", "1.6mm", "2mm", "3mm"],
     correct_answer: 1,
     topic: "Safety & Compliance",
@@ -338,7 +338,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What do the letters in 'OBD-II' stand for?",
-    image_url: null,
+    image_url: undefined,
     options: [
       "Oil Brake Diagnostic",
       "On-Board Diagnostics",
@@ -357,7 +357,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   // ADVANCED QUESTIONS
   {
     question_text: "In a direct injection petrol engine, where is fuel injected?",
-    image_url: null,
+    image_url: undefined,
     options: [
       "Into the intake manifold",
       "Directly into the combustion chamber",
@@ -374,7 +374,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is the purpose of a catalytic converter?",
-    image_url: null,
+    image_url: undefined,
     options: [
       "Increase engine power",
       "Reduce harmful emissions",
@@ -391,7 +391,7 @@ export const SAMPLE_QUESTIONS: Omit<Question, 'id' | 'created_by' | 'created_at'
   },
   {
     question_text: "What is 'engine knocking' also known as?",
-    image_url: null,
+    image_url: undefined,
     options: ["Pinging or detonation", "Valve tapping", "Turbo whistle", "Exhaust backfire"],
     correct_answer: 0,
     topic: "Engine Fundamentals",

@@ -51,17 +51,22 @@ export default function LandingPage() {
             <Button
               variant="primary"
               size="lg"
-              onClick={() => navigate('/student/join')}
+              onClick={() => {
+                // Set demo player info and go to race
+                sessionStorage.setItem('playerName', 'Test Player');
+                sessionStorage.setItem('playerColor', '#3b82f6');
+                navigate('/race');
+              }}
             >
-              Join a Race
+              Quick Start Race
               <ArrowRight className="w-5 h-5" />
             </Button>
             <Button
               variant="secondary"
               size="lg"
-              onClick={() => navigate('/teacher/dashboard')}
+              onClick={() => navigate('/student/join')}
             >
-              Create Session
+              Join Session
             </Button>
           </div>
         </div>
